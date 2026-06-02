@@ -1,0 +1,31 @@
+[Unit]
+Description=DRS High-Precision Distributed Synchronization Daemon
+Documentation=https://github.com/SimonKrist/fhtw_des_multi_node_clock_sync
+After=network-online.target drs-sync-precond.service drs-perf-governor.service drs-irq-affinity.service drs-nic-tune.service
+Wants=network-online.target drs-sync-precond.service drs-perf-governor.service drs-irq-affinity.service drs-nic-tune.service
+Conflicts=systemd-timesyncd.service chronyd.service ntpd.service ptp4l.service phc2sys.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/drs_syncd eth0
+Restart=on-failure
+RestartSec=5s
+
+# RT Hardening (Architecture §7 / NF-7 / NF-10 / NF-16)
+CPUAffinity=3
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=85
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
+
+# Security
+NoNewPrivileges=true
+SupplementaryGroups=gpio
+PrivateTmp=false
+ProtectKernelTunables=false
+ProtectKernelModules=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=DRS Precondition: disable NIC interrupt coalescing
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'ethtool -C eth0 rx-usecs 0 tx-usecs 0 || true'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+[Unit]
+Description=DRS Precondition: mask conflicting time services
+DefaultDependencies=no
+Before=drs-sync.service
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '\
+    for svc in systemd-timesyncd chronyd ntpd ptp4l phc2sys; do \
+        systemctl is-active --quiet "$svc.service" && systemctl stop "$svc.service" || true; \
+        systemctl is-enabled --quiet "$svc.service" && systemctl mask "$svc.service" || true; \
+    done; exit 0'
+
+[Install]
+WantedBy=multi-user.target

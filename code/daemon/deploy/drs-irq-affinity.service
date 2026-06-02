@@ -1,0 +1,15 @@
+[Unit]
+Description=DRS Precondition: pin eth0 IRQs away from CPU 3
+Documentation=Architecture §2.4 / F-23 / NF-16
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '\
+    for irq in $(grep -E "eth0" /proc/interrupts 2>/dev/null | awk -F: "{print \$1}" | tr -d " "); do \
+        echo "0-2" > /proc/irq/$$irq/smp_affinity_list 2>/dev/null || true; \
+    done'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+#import "../template/src/uastw-thesis-lib.typ": *
+#heading(outlined: false, bookmarked: true, numbering: none)[Summary]
+
+This lab report documents the design, iterative refinement, and implementation of a Distributed High-Precision User-Space Clock Synchronization daemon (*DRS*, `drs_syncd`) for a cluster of Raspberry Pi 4B nodes. The primary objective is a physical GPIO pulse delta of *less than 100 µs* between any two nodes, verified externally by a logic analyzer — entirely without kernel modules, GPS, or NTP.
+
+The architecture evolved through six documented revisions (V0–V6). The final implementation in the `bigpickle` codebase realizes a 7-state finite state machine (GROUND → CALIBRATION → LISTEN → CANDIDATE → FOLLOWER / LEADER → HOLDOVER) governed by a term-based leader election with a lower-NodeID invariant: the node with the lowest IPv4 last-octet always holds leadership, regardless of whether a higher-ID peer accumulated a higher election term by booting alone. The synchronization protocol uses a 4-timestamp PTP-style handshake over fixed-size UDP packets; the default build (`PROTO_VER=2`) uses 64-byte packets with version byte `0x02`, while a `PROTO_VER=1` build produces the 66-byte V1 format. The version byte provides automatic isolation between clusters built for different protocol versions. Network jitter is rejected by a Min-Delay Rolling-Window filter (N=10, tolerance 200 µs); clock discipline is applied by a dual-loop fixed-point PI controller (Kp=0.1, Ki=0.01) that switches between gradual frequency slewing (±1000 ppm) and a hard phase step for coarse corrections.
+
+Five `systemd` units enforce RT hardening: CPU Core 3 isolation, SCHED_FIFO priority 85, performance CPU governor, Ethernet IRQ pinning, and NIC interrupt-coalescing disable. A dedicated non-RT sender thread streams 40-byte telemetry records over UDP (port 4242) via a lock-free ring buffer; the destination IP and protocol version are freely configurable via the `TELEM_IP` and `PROTO_VER` Makefile variables.
+
+#v(2em)
+*Keywords:* Distributed Real-Time Systems, Clock Synchronization, User-Space, UDP Multicast, Raspberry Pi 4B, Virtual Clock, Q32.32 Fixed-Point, Min-Delay Filter, PI Controller, SCHED_FIFO, Seqlock.
