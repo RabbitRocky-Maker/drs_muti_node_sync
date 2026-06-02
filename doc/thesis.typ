@@ -17,8 +17,10 @@
 #let title = [Lab Report of Exercise 2:\ Multi-Node Clock Sync]
 #let subTitle = "Distributed User-Space Synchronization with < 100 µs Precision"
 
-#let authorName = "Ing. Simon Mustermann, BSc"
-#let authorID = "1234567890"
+#let authorName  = "Simon Krist"
+#let authorID   = ""
+#let authorName2 = "Zhi Heng Yao"
+#let authorID2  = ""
 
 #let adv1 = ""
 #let adv2 = ""
@@ -37,8 +39,10 @@
     study-program: std, 
     thesis-title: title, 
     thesis-subtitle: subTitle,
-    author: authorName, 
-    authorid: authorID, 
+    author: authorName,
+    authorid: authorID,
+    author2: authorName2,
+    authorid2: authorID2,
     advisor1: adv1,
     advisor2: adv2,    
     location: loc)

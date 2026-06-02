@@ -100,10 +100,12 @@ Weiters bestätige ich, dass ich die vorliegende Arbeit bis dato nicht veröffen
 	study-program: "Electronics", 
 	thesis-title: "title",
 	thesis-subtitle: "",	
-	author: "Ing. Max Mustermann", 
-	authorid: "123456789", 
-	advisor1: "Dr. Know Itall", 
-	advisor2: "Wunder Wuzzi, MSc.", 
+	author: "Ing. Max Mustermann",
+	authorid: "123456789",
+	author2: "",
+	authorid2: "",
+	advisor1: "Dr. Know Itall",
+	advisor2: "Wunder Wuzzi, MSc.",
 	location: "Wien", body
 ) = {
 	[
@@ -155,24 +157,25 @@ Weiters bestätige ich, dass ich die vorliegende Arbeit bis dato nicht veröffen
 		#place(top + left, dx: 1.2cm, dy: 14.8cm)[
 			#text(font: "Open Sans", 16pt)[
 				#set par(leading: 1em)
-				#if language == "en" [
-					By: #author \
-					Student Number: #authorid \ #v(1.5em)
-					#location, #datetime.today().display()
-				] else [
-					Ausgeführt von: #author \
-					Personenkennzeichen: #authorid \ #v(1.5em)
-					#location, #datetime.today().display()
-				]
+				#{
+					let by_lbl = if language == "en" { "By: " } else { "Ausgeführt von: " }
+					let id_lbl = if language == "en" { "Student Number: " } else { "Personenkennzeichen: " }
+					[#by_lbl#author \ ]
+					if authorid  != "" { [#id_lbl#authorid \ ] }
+					if author2   != "" { [#by_lbl#author2 \ ] }
+					if authorid2 != "" { [#id_lbl#authorid2 \ ] }
+					v(1.5em)
+					[#location, #datetime.today().display()]
+				}
 			]			
 		]
 		// --- SET PDF FILE INFORMATION ----------------------------------------
 		#set document(
 		  title: thesis-title,
-		  author: (author),
+		  author: if author2 != "" { (author, author2) } else { (author,) },
 		  keywords: (thesis-type),
 		  date: auto,
-		)		
+		)
 	]
 	body
 }
